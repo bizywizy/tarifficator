@@ -85,5 +85,4 @@ func (s *CompareService) CompareTariffsHandler(w http.ResponseWriter, r *http.Re
 		Objects: dtos,
 	}
 	util.ResponseJson(w, http.StatusOK, responseBody)
-	return
 }
