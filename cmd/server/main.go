@@ -4,7 +4,7 @@ import (
 	"github.com/shopspring/decimal"
 	"log"
 	"net/http"
-	httpApi "tarifficator/cmd/server/api/http"
+	httpApi "tarifficator/internal/api/http"
 	"tarifficator/pkg/tariff"
 	"tarifficator/pkg/tariff/calculator/basic"
 	"tarifficator/pkg/tariff/calculator/packaged"

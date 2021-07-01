@@ -3,7 +3,7 @@ package tariff
 import (
 	"github.com/shopspring/decimal"
 	"net/http"
-	"tarifficator/cmd/server/api/http/util"
+	util2 "tarifficator/internal/api/http/util"
 	"tarifficator/pkg/tariff"
 )
 
@@ -34,41 +34,41 @@ type CompareService struct {
 func (s *CompareService) CompareTariffsHandler(w http.ResponseWriter, r *http.Request) {
 	rawConsumption, ok := r.URL.Query()[consumptionKey]
 	if !ok {
-		util.ResponseError(
+		util2.ResponseError(
 			w,
 			http.StatusBadRequest,
 			consumptionKeyNotFoundErrMsg,
-			util.ErrorDetail{consumptionKey: []string{notFoundErrKey}},
+			util2.ErrorDetail{consumptionKey: []string{notFoundErrKey}},
 		)
 		return
 	}
 	if len(rawConsumption) != 1 {
-		util.ResponseError(
+		util2.ResponseError(
 			w,
 			http.StatusBadRequest,
 			invalidConsumptionErrMsg,
-			util.ErrorDetail{consumptionKey: []string{invalidErrKey}},
+			util2.ErrorDetail{consumptionKey: []string{invalidErrKey}},
 		)
 		return
 	}
 
 	consumption, err := decimal.NewFromString(rawConsumption[0])
 	if err != nil {
-		util.ResponseError(
+		util2.ResponseError(
 			w,
 			http.StatusBadRequest,
 			invalidConsumptionErrMsg,
-			util.ErrorDetail{consumptionKey: []string{notValidDecimalErrKey}},
+			util2.ErrorDetail{consumptionKey: []string{notValidDecimalErrKey}},
 		)
 		return
 	}
 	comparisons, err := s.comparator.Compare(consumption)
 	if err != nil {
-		util.ResponseError(
+		util2.ResponseError(
 			w,
 			http.StatusInternalServerError,
 			unexpectedErrorErrMsg,
-			util.ErrorDetail{},
+			util2.ErrorDetail{},
 		)
 		return
 	}
@@ -84,5 +84,5 @@ func (s *CompareService) CompareTariffsHandler(w http.ResponseWriter, r *http.Re
 		Total:   len(dtos),
 		Objects: dtos,
 	}
-	util.ResponseJson(w, http.StatusOK, responseBody)
+	util2.ResponseJson(w, http.StatusOK, responseBody)
 }

@@ -3,7 +3,7 @@ package http
 import (
 	"github.com/shopspring/decimal"
 	"net/http"
-	tariffApi "tarifficator/cmd/server/api/http/tariff"
+	tariff2 "tarifficator/internal/api/http/tariff"
 	"tarifficator/pkg/tariff"
 )
 
@@ -12,7 +12,7 @@ type comparator interface {
 }
 
 func NewMux(comparator comparator) *http.ServeMux {
-	compareService := tariffApi.NewCompareService(comparator)
+	compareService := tariff2.NewCompareService(comparator)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/tariffs/compare", compareService.CompareTariffsHandler)
 	return mux
