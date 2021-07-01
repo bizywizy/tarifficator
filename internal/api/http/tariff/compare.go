@@ -3,20 +3,17 @@ package tariff
 import (
 	"github.com/shopspring/decimal"
 	"net/http"
-	util2 "tarifficator/internal/api/http/util"
+	"tarifficator/internal/api/http/util"
 	"tarifficator/pkg/tariff"
 )
 
 const (
 	consumptionKey = "consumption"
 
-	consumptionKeyNotFoundErrMsg = "You have to provide `consumption` key in query string."
-	invalidConsumptionErrMsg     = "`consumption` must be a valid decimal, like \"1234.56\"."
-	unexpectedErrorErrMsg        = "Unexpected error occurred. Try again later."
+	invalidConsumptionErrMsg = "You have to provide a valid decimal into `consumption` key in query string. like \"1234.56\"."
+	unexpectedErrorErrMsg    = "Unexpected error occurred. Try again later."
 
-	notFoundErrKey        = "not_found"
-	invalidErrKey         = "invalid"
-	notValidDecimalErrKey = "not_valid_decimal"
+	invalidErrKey = "invalid"
 )
 
 type comparator interface {
@@ -32,43 +29,23 @@ type CompareService struct {
 }
 
 func (s *CompareService) CompareTariffsHandler(w http.ResponseWriter, r *http.Request) {
-	rawConsumption, ok := r.URL.Query()[consumptionKey]
-	if !ok {
-		util2.ResponseError(
-			w,
-			http.StatusBadRequest,
-			consumptionKeyNotFoundErrMsg,
-			util2.ErrorDetail{consumptionKey: []string{notFoundErrKey}},
-		)
-		return
-	}
-	if len(rawConsumption) != 1 {
-		util2.ResponseError(
-			w,
-			http.StatusBadRequest,
-			invalidConsumptionErrMsg,
-			util2.ErrorDetail{consumptionKey: []string{invalidErrKey}},
-		)
-		return
-	}
-
-	consumption, err := decimal.NewFromString(rawConsumption[0])
+	consumption, err := decimal.NewFromString(r.URL.Query().Get(consumptionKey))
 	if err != nil {
-		util2.ResponseError(
+		util.ResponseError(
 			w,
 			http.StatusBadRequest,
 			invalidConsumptionErrMsg,
-			util2.ErrorDetail{consumptionKey: []string{notValidDecimalErrKey}},
+			util.ErrorDetail{consumptionKey: []string{invalidErrKey}},
 		)
 		return
 	}
 	comparisons, err := s.comparator.Compare(consumption)
 	if err != nil {
-		util2.ResponseError(
+		util.ResponseError(
 			w,
 			http.StatusInternalServerError,
 			unexpectedErrorErrMsg,
-			util2.ErrorDetail{},
+			util.ErrorDetail{},
 		)
 		return
 	}
@@ -84,5 +61,5 @@ func (s *CompareService) CompareTariffsHandler(w http.ResponseWriter, r *http.Re
 		Total:   len(dtos),
 		Objects: dtos,
 	}
-	util2.ResponseJson(w, http.StatusOK, responseBody)
+	util.ResponseJson(w, http.StatusOK, responseBody)
 }
